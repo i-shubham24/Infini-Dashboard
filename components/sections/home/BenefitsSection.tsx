@@ -1,0 +1,131 @@
+import Image from "next/image";
+import { Container } from "@/components/ui/container";
+import { ThemeSection } from "@/components/sections/shared/ThemeSection";
+import { Activity, Wind, Sparkles, Shield } from "lucide-react";
+import { MonoLabel } from "./MonoLabel";
+import { Reveal } from "@/components/ui/reveal";
+import { EmphasisHeading } from "./EmphasisHeading";
+import { AntigravityLazy } from "@/components/ui/antigravity-lazy";
+import { DesktopOnly } from "@/components/ui/desktop-only";
+
+const BENEFITS = [
+  {
+    icon: Activity,
+    title: "Friction Reduction",
+    description: "Dramatically lower friction coefficients on transmission and engine components, minimizing energy loss and heat generation.",
+    image: "/images/placeholders/gallery-02-spur-gear.jpg",
+    imageAlt: "Superfinished spur gear teeth and bore, friction reduced on every flank",
+  },
+  {
+    icon: Shield,
+    title: "Extended Lifespan",
+    description: "By eliminating micro-defects and stress concentrators, components exhibit superior fatigue resistance and durability.",
+    image: "/images/placeholders/gallery-05-carbide-drills.jpg",
+    imageAlt: "Carbide drills with extended tool life after MMP treatment",
+  },
+  {
+    icon: Wind,
+    title: "Aerodynamics & Hydrodynamics",
+    description: "Optimized surface profiles for turbine blades and fluid-handling parts to maximize flow efficiency.",
+    image: "/images/placeholders/gallery-01-turbine-ring.jpg",
+    imageAlt: "Mirror-polished bladed turbine ring for aerodynamic flow",
+  },
+  {
+    icon: Sparkles,
+    title: "Premium Aesthetics",
+    description: "Mirror-like finishes that not only perform exceptionally but provide the visual perfection required by luxury and medical sectors.",
+    image: "/images/placeholders/gallery-03-knee-implant.jpg",
+    imageAlt: "Mirror-finish femoral knee implant component",
+  },
+];
+
+export function BenefitsSection() {
+  return (
+    <ThemeSection theme="dark" ariaLabel="MMP Technology Added Values" className="relative overflow-hidden">
+      {/* Subtle background glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[400px] bg-accent/20 blur-[120px] rounded-full pointer-events-none opacity-50" />
+      
+      {/* React Bits Antigravity Background, desktop only: a 250-particle WebGL
+          field is a slideshow on phone GPUs and pulls three.js onto mobile
+          data. Phones keep the static glow above, which carries the look. */}
+      <DesktopOnly>
+        <div className="absolute inset-0 z-0 opacity-40 pointer-events-none mix-blend-screen">
+          <AntigravityLazy
+            count={250}
+            magnetRadius={8}
+            ringRadius={8}
+            waveSpeed={0.3}
+            waveAmplitude={1.5}
+            particleSize={1.5}
+            lerpSpeed={0.05}
+            color="#ff274a" // INFINI brand red
+            autoAnimate={true}
+            particleVariance={1}
+            rotationSpeed={0.2}
+          />
+        </div>
+      </DesktopOnly>
+      
+      <Container className="relative z-10 flex flex-col gap-12 lg:gap-16">
+        <Reveal className="flex flex-col items-center text-center gap-4 max-w-3xl mx-auto">
+          <MonoLabel>Added Values</MonoLabel>
+          <h2 className="text-[clamp(2.5rem,5vw,3.75rem)] leading-[1.05] font-semibold tracking-[-0.03em] text-balance text-white">
+            <EmphasisHeading text="The engineering impact of MMP Technology" />
+          </h2>
+          <p className="text-neutral-400 text-lg leading-relaxed mt-2 max-w-2xl">
+            Super precision finishing is not just about smoothness. It&apos;s about fundamentally enhancing the mechanical and physical properties of your most critical parts.
+          </p>
+        </Reveal>
+
+        <div className="flex flex-col lg:flex-row w-full gap-4 lg:h-[450px]">
+          {BENEFITS.map((benefit) => {
+            const Icon = benefit.icon;
+            return (
+              <Reveal 
+                key={benefit.title} 
+                className="group relative flex-1 flex flex-col gap-5 overflow-hidden rounded-3xl bg-neutral-900/50 border border-white/10 p-5 sm:p-6 transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] lg:hover:flex-[1.5] hover:bg-neutral-950 hover:border-accent/50 cursor-pointer shadow-lg backdrop-blur-sm"
+              >
+                {/* Black-and-white component photograph, top of card */}
+                <div className="relative z-10 h-44 w-full shrink-0 overflow-hidden rounded-2xl border border-white/10 sm:h-48">
+                  <Image
+                    src={benefit.image}
+                    alt={benefit.imageAlt}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 25vw"
+                    loading="lazy"
+                    className="object-cover grayscale contrast-[1.05] transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent"
+                  />
+                </div>
+
+                {/* Background Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
+                
+                {/* Content */}
+                <div className="relative z-10 flex flex-col gap-5 mt-auto">
+                  <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-white/5 text-white backdrop-blur-md transition-colors duration-700 group-hover:bg-accent shadow-lg border border-white/10 group-hover:border-accent/50">
+                    <Icon className="size-6" strokeWidth={2} />
+                  </span>
+                  
+                  <div className="flex flex-col">
+                    <h3 className="font-semibold text-white text-xl tracking-tight transition-transform duration-700 lg:group-hover:-translate-y-1">{benefit.title}</h3>
+                    
+                    {/* Expandable text */}
+                    <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] lg:group-hover:grid-rows-[1fr] lg:group-hover:opacity-100 max-lg:grid-rows-[1fr] max-lg:opacity-100 max-lg:mt-3">
+                      <div className="overflow-hidden">
+                        <p className="text-sm sm:text-base leading-relaxed text-neutral-400 mt-2 pb-2">{benefit.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+            );
+          })}
+        </div>
+      </Container>
+    </ThemeSection>
+  );
+}

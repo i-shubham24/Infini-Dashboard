@@ -1,0 +1,187 @@
+import Image from "next/image";
+import Link from "next/link";
+import {
+  IconBrandLinkedin,
+  IconBrandInstagram,
+  IconBrandFacebook,
+  IconBrandX,
+  IconBrandYoutube,
+} from "@tabler/icons-react";
+import { Container } from "@/components/ui/container";
+import type { NavLink, SettingsContact, SettingsSocial } from "@/lib/types";
+
+function contactDetailsFrom(contact: SettingsContact | null) {
+  if (!contact) return [];
+  return [
+    { label: "Email", value: contact.email, href: `mailto:${contact.email}` },
+    { label: "Phone", value: contact.phone, href: `tel:${contact.phone.replace(/[^\d+]/g, "")}` },
+    { label: "Facility", value: contact.address, href: undefined },
+  ];
+}
+
+/**
+ * Canonical INFINI social URLs. Mirrors `settings.social` in the seed
+ * (backend/scripts/content.ts) and stands in per field when the live settings
+ * document has not set that network, the same "never render a hole" fallback
+ * pattern the hero and gallery use. A value set in Firestore always wins.
+ */
+const SOCIAL_FALLBACK: SettingsSocial = {
+  linkedin: "https://www.linkedin.com/in/infini-precision-private-limited-73b19921b/",
+  instagram: "https://www.instagram.com/infiniprecisionpvt.ltd/",
+  youtube: "https://youtu.be/YKcmtDuxXks",
+  facebook: "https://www.facebook.com/profile.php?id=100064548354724",
+  x: "https://x.com/preision",
+};
+
+/** Social profiles, in display order. Each falls back to the canonical URL above, so a network the live settings document has not set still renders. */
+function socialLinksFrom(social: SettingsSocial | null) {
+  const s = social ?? SOCIAL_FALLBACK;
+  return [
+    { label: "LinkedIn", href: s.linkedin || SOCIAL_FALLBACK.linkedin, Icon: IconBrandLinkedin },
+    { label: "Instagram", href: s.instagram || SOCIAL_FALLBACK.instagram, Icon: IconBrandInstagram },
+    { label: "Facebook", href: s.facebook || SOCIAL_FALLBACK.facebook, Icon: IconBrandFacebook },
+    { label: "X", href: s.x || SOCIAL_FALLBACK.x, Icon: IconBrandX },
+    { label: "YouTube", href: s.youtube || SOCIAL_FALLBACK.youtube, Icon: IconBrandYoutube },
+  ].filter((entry) => Boolean(entry.href));
+}
+
+const COLUMN_HEADING = "font-mono text-[11px] font-medium tracking-[0.22em] text-muted-foreground uppercase";
+const COLUMN_LINK = "w-fit text-sm text-foreground/80 transition-colors hover:text-accent";
+
+export function Footer({
+  navItems,
+  legalLinks,
+  contact,
+  social,
+}: {
+  navItems: NavLink[];
+  legalLinks: NavLink[];
+  contact: SettingsContact | null;
+  social: SettingsSocial | null;
+}) {
+  const year = new Date().getFullYear();
+  const contactDetails = contactDetailsFrom(contact);
+  const socialLinks = socialLinksFrom(social);
+
+  return (
+    <footer className="relative overflow-hidden border-t border-border bg-background">
+      <Container className="flex flex-col gap-16 py-16 sm:py-20">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
+          <div className="flex flex-col gap-6 sm:col-span-2 lg:col-span-4">
+            <Link href="/" className="w-fit" aria-label="INFINI home">
+              <Image
+                src="/brand/infini-finish-unlimited.png"
+                data-mono="off"
+                alt="INFINI, Finish Unlimited"
+                width={1000}
+                height={491}
+                className="h-12 w-auto"
+              />
+            </Link>
+            <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
+              A specialist surface finishing partner to precision manufacturers. MMP treatment applied in-house, verified before it ships.
+            </p>
+            {socialLinks.length > 0 && (
+              <ul className="flex flex-wrap items-center gap-3">
+                {socialLinks.map(({ label, href, Icon }) => (
+                  <li key={label}>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${label} (opens in a new tab)`}
+                      className="flex size-10 items-center justify-center rounded-full border border-border text-foreground/70 transition-colors hover:border-accent hover:text-accent"
+                    >
+                      <Icon className="size-[18px]" stroke={1.75} aria-hidden="true" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <nav aria-label="Footer" className="flex flex-col gap-3 lg:col-span-2 lg:col-start-6">
+            <h2 className={COLUMN_HEADING}>Navigate</h2>
+            {navItems.map((item) => (
+              <Link key={item.label} href={item.href} className={COLUMN_LINK}>
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex flex-col gap-3 lg:col-span-3">
+            <h2 className={COLUMN_HEADING}>Contact</h2>
+            <ul className="flex flex-col gap-3">
+              {contactDetails.map((detail) => (
+                <li key={detail.label}>
+                  {detail.href ? (
+                    <a href={detail.href} className={COLUMN_LINK}>
+                      {detail.value}
+                    </a>
+                  ) : (
+                    <span className="text-sm text-foreground/80">{detail.value}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex flex-col gap-3 lg:col-span-2">
+            <h2 className={COLUMN_HEADING}>Legal</h2>
+            {legalLinks.map((link) => (
+              <Link key={link.label} href={link.href} className={COLUMN_LINK}>
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-start sm:justify-end">
+            <a
+              href="https://www.humblesolutions.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-[11px] tracking-[0.2em] text-muted-foreground uppercase transition-colors hover:text-accent"
+            >
+              Crafted by Humble Solutions
+            </a>
+          </div>
+          <div className="flex flex-col gap-3 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-muted-foreground">
+              &copy; {year} INFINI Precision Pvt. Ltd. ISO 9001-certified MMP surface finishing.
+            </p>
+            {/* The mark the process is licensed under. The old header lockup carried it,
+                but dark-on-dark it was invisible against the near-black chrome. */}
+            <a
+              href="https://mmptechnology.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="MMP Technology (opens in a new tab)"
+              className="flex w-fit items-center gap-3 transition-opacity hover:opacity-100"
+            >
+              <span className="font-mono text-[11px] tracking-[0.24em] text-muted-foreground uppercase">
+                Powered by
+              </span>
+              <Image
+                src="/brand/mmp-technology-light.png"
+                data-mono="off"
+                alt="MMP Technology"
+                width={700}
+                height={538}
+                className="h-9 w-auto opacity-80"
+              />
+            </a>
+          </div>
+        </div>
+      </Container>
+
+      {/* Oversized wordmark, cropped by the footer's bottom edge, a brand sign-off, not content. */}
+      <div aria-hidden="true" className="pointer-events-none -mb-[3vw] select-none">
+        <p className="text-center text-[clamp(5rem,23vw,24rem)] leading-[0.8] font-bold tracking-[-0.07em] text-foreground/[0.06]">
+          INFINI
+        </p>
+      </div>
+    </footer>
+  );
+}

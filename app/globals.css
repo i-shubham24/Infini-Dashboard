@@ -1,0 +1,579 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-sans-loaded), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif-loaded), ui-serif, Georgia, serif;
+  --font-mono: var(--font-mono-loaded), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-background: #060606;
+  --color-background-elevated: #0a0808;
+  --color-foreground: #f5f3f2;
+  --color-card: rgba(20, 18, 18, 0.65);
+  --color-card-foreground: #f5f3f2;
+  --color-popover: #0c0b0b;
+  --color-popover-foreground: #f5f3f2;
+  /* Fill color for buttons/backgrounds, paired with light text/foreground; darkened from the
+     brand red so bg-primary + text-primary-foreground clears WCAG AA (4.5:1). */
+  --color-primary: #c81820;
+  --color-primary-foreground: #f5f3f2;
+  --color-primary-muted: #2a1213;
+  --color-secondary: #171515;
+  --color-secondary-foreground: #f5f3f2;
+  --color-muted: #1d1b1b;
+  --color-muted-foreground: #a3a0a0;
+  /* Text/icon/link color on dark backgrounds, brighter than --color-primary so red text on
+     black clears WCAG AA (4.5:1); the two can't share one value, see docs/UI-STANDARDS.md. */
+  --color-accent: #f23540;
+  --color-accent-foreground: #f5f3f2;
+  --color-destructive: #d51f1f;
+  --color-destructive-foreground: #ffffff;
+  --color-border: rgba(245, 243, 242, 0.12);
+  --color-input: rgba(245, 243, 242, 0.16);
+  --color-input-background: rgba(20, 18, 18, 0.45);
+  --color-switch-background: #1d1b1b;
+  --color-ring: #f23540;
+
+  --color-primary-rgb: 200, 24, 32;
+  --color-accent-rgb: 242, 53, 64;
+  --color-foreground-rgb: 245, 243, 242;
+  --color-shadow-rgb: 0, 0, 0;
+
+  --color-sidebar: #0c0b0b;
+  --color-sidebar-foreground: #f5f3f2;
+  --color-sidebar-primary: #c81820;
+  --color-sidebar-primary-foreground: #f5f3f2;
+  --color-sidebar-accent: #171515;
+  --color-sidebar-accent-foreground: #f5f3f2;
+  --color-sidebar-border: rgba(245, 243, 242, 0.12);
+  --color-sidebar-ring: #f23540;
+
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 56s linear infinite;
+  --animate-aurora-a: aurora-a 13s ease-in-out infinite alternate;
+  --animate-aurora-b: aurora-b 17s ease-in-out infinite alternate;
+  --animate-aurora-c: aurora-c 21s ease-in-out infinite alternate;
+
+  /* Metallic greys for caption scrims over photography, decorative only, never used for body text. */
+  --color-metal-900: #262626;
+  --color-metal-500: #8c8c8c;
+  --color-metal-100: #ededed;
+}
+
+/*
+ * Section surfaces. The site is dark by default (the @theme block above);
+ * `data-surface="light"` re-points every surface token to the light family for
+ * one subtree, and `data-surface="brand"` does the same for the brand-colour block.
+ * Components keep using bg-background / text-foreground / border-border and
+ * flip automatically, so no section ever hardcodes a colour.
+ */
+[data-surface="light"] {
+  /* Warm off-white, not pure white. Pure #fff against the near-black band
+     reads as a harsh stripe; a cream ground holds the same contrast while the
+     page reads as one material. */
+  --color-background: #f4f2ed;
+  --color-background-elevated: #ffffff;
+  --color-foreground: #0b0a0a;
+  --color-card: #ffffff;
+  --color-card-foreground: #0b0a0a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0b0a0a;
+  --color-primary: #c81820;
+  --color-primary-foreground: #ffffff;
+  --color-primary-muted: #fbe9ea;
+  --color-secondary: #f4f2f1;
+  --color-secondary-foreground: #0b0a0a;
+  --color-muted: #ece9e8;
+  --color-muted-foreground: #5f5a5a;
+  --color-accent: #c81820;
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #c81820;
+  --color-destructive-foreground: #ffffff;
+  --color-border: rgba(11, 10, 10, 0.12);
+  --color-input: rgba(11, 10, 10, 0.18);
+  --color-input-background: #ffffff;
+  --color-switch-background: #ece9e8;
+  --color-ring: #c81820;
+  --color-accent-rgb: 200, 24, 32;
+  --color-foreground-rgb: 11, 10, 10;
+  --color-shadow-rgb: 11, 10, 10;
+}
+
+[data-surface="brand"] {
+  --color-background: #c81820;
+  --color-background-elevated: #b3151c;
+  --color-foreground: #ffffff;
+  --color-card: #b3151c;
+  --color-card-foreground: #ffffff;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0b0a0a;
+  --color-primary: #0b0a0a;
+  --color-primary-foreground: #ffffff;
+  --color-primary-muted: #a5131a;
+  --color-secondary: #b3151c;
+  --color-secondary-foreground: #ffffff;
+  --color-muted: #b3151c;
+  /* Lifted from #fbd5d7, which measured 4.32:1 on the brand red and so missed
+     WCAG AA for body text. #fde8e9 clears it at 4.96:1 and still reads as
+     secondary against the pure-white foreground (5.82:1). */
+  --color-muted-foreground: #fde8e9;
+  --color-accent: #ffffff;
+  --color-accent-foreground: #c81820;
+  --color-border: rgba(255, 255, 255, 0.28);
+  --color-input: rgba(255, 255, 255, 0.35);
+  --color-input-background: #b3151c;
+  --color-switch-background: #b3151c;
+  --color-ring: #ffffff;
+  --color-accent-rgb: 255, 255, 255;
+  --color-foreground-rgb: 255, 255, 255;
+  --color-shadow-rgb: 60, 0, 0;
+}
+
+/* ---- Home page ---- */
+
+/* Hero backdrop: a faint drafting grid that fades out towards the bottom-right. */
+.hero-grid {
+  background-image:
+    linear-gradient(to right, var(--color-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 70% 80% at 25% 15%, black 10%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 25% 15%, black 10%, transparent 75%);
+}
+
+/*
+ * Hero infinity mark: Pure SVG/CSS tapered glowing neon beam.
+ * Multi-layer synchronized stroke composition creating a continuous,
+ * white-hot leading head, saturated brand red body, and tapered fading tail.
+ */
+.infinity-layer-aura,
+.infinity-layer-bloom,
+.infinity-layer-tail,
+.infinity-layer-mid-tail,
+.infinity-layer-body,
+.infinity-layer-inner-core,
+.infinity-layer-head-white {
+  animation: infinity-running-loop var(--infinity-duration, 4.4s) linear infinite;
+  will-change: stroke-dashoffset;
+}
+
+/* Layer 1: Wide diffuse red aura */
+.infinity-layer-aura {
+  stroke-dasharray: calc(var(--infinity-length) * 0.46) calc(var(--infinity-length) * 0.54);
+  opacity: 0.35;
+}
+
+/* Layer 2: Tight bright red bloom */
+.infinity-layer-bloom {
+  stroke-dasharray: calc(var(--infinity-length) * 0.48) calc(var(--infinity-length) * 0.52);
+  opacity: 0.8;
+}
+
+/* Layer 3: Fading fine tail tip (spans 58% of loop, thin & subtle) */
+.infinity-layer-tail {
+  stroke-dasharray: calc(var(--infinity-length) * 0.58) calc(var(--infinity-length) * 0.42);
+  opacity: 0.4;
+}
+
+/* Layer 4: Mid-tail stroke (spans 48% of loop) */
+.infinity-layer-mid-tail {
+  stroke-dasharray: calc(var(--infinity-length) * 0.48) calc(var(--infinity-length) * 0.52);
+  opacity: 0.85;
+}
+
+/* Layer 5: Main thick red beam body (spans 38% of loop) */
+.infinity-layer-body {
+  stroke-dasharray: calc(var(--infinity-length) * 0.38) calc(var(--infinity-length) * 0.62);
+}
+
+/* Layer 6: Inner bright luminous core (spans 24% of loop at front) */
+.infinity-layer-inner-core {
+  stroke-dasharray: calc(var(--infinity-length) * 0.24) calc(var(--infinity-length) * 0.76);
+}
+
+/* Layer 7: Leading white-hot center nucleus (spans 14% of loop at front tip) */
+.infinity-layer-head-white {
+  stroke-dasharray: calc(var(--infinity-length) * 0.14) calc(var(--infinity-length) * 0.86);
+}
+
+@keyframes infinity-running-loop {
+  from {
+    stroke-dashoffset: var(--infinity-length);
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+
+
+
+
+/* Staggered entrance for hero copy, pair with an inline animation-delay. */
+.hero-reveal {
+  animation: fade-up 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Reverse twin: starts mid-loop and drifts back to origin for a seamless
+   counter-moving marquee when paired with a duplicated track. */
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Aurora drift: transform-only loops so mobile GPUs stay in their comfort
+   zone. Each blob runs a different duration for a non-repeating feel. */
+@keyframes aurora-a {
+  from {
+    transform: translate3d(-10%, 6%, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(16%, 20%, 0) scale(1.2);
+  }
+}
+
+@keyframes aurora-b {
+  from {
+    transform: translate3d(12%, -8%, 0) scale(1.12);
+  }
+
+  to {
+    transform: translate3d(-16%, 14%, 0) scale(0.92);
+  }
+}
+
+@keyframes aurora-c {
+  from {
+    transform: translate3d(0%, 8%, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(-18%, -12%, 0) scale(1.25);
+  }
+}
+
+/* Scroll-driven word reveal (Statement) writes inline opacity; under reduced
+   motion the words must simply be readable. `!important` beats inline. */
+@media (prefers-reduced-motion: reduce) {
+  .statement-word {
+    opacity: 1 !important;
+  }
+
+  /* The global reduce rule snaps animations to their end state, which would
+     otherwise leave the flare lit and the tail mid-curve. Park a single dot. */
+  .infinity-layer-aura,
+  .infinity-layer-bloom,
+  .infinity-layer-tail,
+  .infinity-layer-mid-tail,
+  .infinity-layer-body,
+  .infinity-layer-inner-core,
+  .infinity-layer-head-white {
+    display: none;
+  }
+
+
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+
+  to {
+    height: 0;
+  }
+}
+
+/* Marquee horizontal scroll, used by components/ui/marquee */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Meteor / shooting-star diagonal rain */
+@keyframes meteor-fall {
+  0% {
+    transform: rotate(215deg) translateX(0);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: rotate(215deg) translateX(600px);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    /* Decorative oversized marks (hero infinity, aurora blobs) sit partly
+       off-canvas; clip the x-axis globally so a phone never gets a sideways
+       scrollbar or a swipeable white gutter from one stray section. */
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    overflow-x: clip;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  label {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  button {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: var(--color-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  button,
+  a,
+  input,
+  select {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+
+  /* Neutral rather than accent-coloured: a brand-red thumb reads as a stray
+     coloured bar across the window edge, especially on a horizontal scrollbar. */
+  ::-webkit-scrollbar-thumb {
+    background: rgba(var(--color-foreground-rgb), 0.22);
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--color-foreground-rgb), 0.38);
+  }
+
+  select option {
+    background-color: var(--color-popover);
+    color: var(--color-popover-foreground);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * Photography runs monochrome across the public site.
+ *
+ * The palette is black, white and one red, and red is reserved for type. Stock
+ * and component photography arriving in full colour put a second and third
+ * colour on the page and pulled attention off the accent, so every photograph
+ * is desaturated at the surface rather than in the asset. A touch of extra
+ * contrast keeps mid-grey component shots from going flat once the colour is
+ * gone.
+ *
+ * Scoped to the public tree so admin media thumbnails keep their true colour,
+ * and opt out per image with data-mono="off" where colour carries meaning.
+ */
+[data-site="public"] img:not([data-mono="off"]) {
+  filter: grayscale(1) contrast(1.06);
+}
+
+/*
+ * Route curtain: the glowing neon infinity animation, centered on black.
+ *
+ * Instant paint: the browser paints #000 on its first frame, preventing any
+ * unstyled flicker. The lift is a smooth opacity transition driven by `data-state`.
+ */
+.route-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+  background: #000000;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s linear 0s;
+}
+
+.route-curtain[data-state="done"] {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s linear 320ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-curtain {
+    display: none;
+  }
+}
+
+/*
+ * Entrance blur is paint-expensive on phone GPUs (a full-layer blur repaints
+ * every frame of every Reveal on the page). Inline styles set by framer-motion
+ * lose to `!important`, so on small screens entrances keep their fade + rise
+ * and simply skip the de-blur pass. Desktop is untouched.
+ */
+@media (max-width: 640px) {
+  [data-reveal] {
+    filter: none !important;
+  }
+}
+
+/* Testimonial carousel autoplay segment. Duration comes from the component
+   (AUTOPLAY_MS) via inline animation-duration; the keyframes only describe
+   the fill. Pausing toggles animation-play-state, so bar and timer stay
+   visually glued without JS frame bookkeeping. */
+@keyframes testimonial-progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.testimonial-progress {
+  transform-origin: left center;
+  animation-name: testimonial-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.testimonial-progress-paused {
+  animation-play-state: paused;
+}

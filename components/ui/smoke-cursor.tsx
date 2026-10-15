@@ -1,0 +1,87 @@
+"use client";
+
+import { useEffect, useSyncExternalStore } from "react";
+import { usePathname } from "next/navigation";
+import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+
+function subscribeFinePointer(callback: () => void) {
+  const query = window.matchMedia("(pointer: fine)");
+  query.addEventListener("change", callback);
+  return () => query.removeEventListener("change", callback);
+}
+
+/**
+ * Post-mount flag as an external store: server snapshot false, client
+ * snapshot true. The subscription fires once on mount, flipping the value
+ * after hydration commits, so the server HTML (null) and the first client
+ * render (null) always agree.
+ */
+function subscribeMounted(callback: () => void) {
+  callback();
+  return () => {};
+}
+
+/**
+ * Ambient red-smoke cursor: a small glowing core that tracks the pointer
+ * tightly plus a larger smoke wisp that lags behind on a looser spring.
+ * Performance notes: cursor position flows through motion values (no React
+ * re-renders per mousemove), all movement is GPU transform-only, and the
+ * listener is passive. Interaction-safe: the layer is pointer-events-none so
+ * every click, drag and text selection passes straight through, and the
+ * native cursor stays visible. Renders only on fine-pointer devices (mice,
+ * trackpads), touch screens get nothing, and nothing at all under reduced
+ * motion.
+ */
+export function SmokeCursor() {
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith("/admin");
+  const reduce = useReducedMotion();
+  // Server snapshot is always false so hydration matches; after hydration
+  // the live query takes over (and follows device changes for free).
+  const finePointer = useSyncExternalStore(
+    subscribeFinePointer,
+    () => window.matchMedia("(pointer: fine)").matches,
+    () => false,
+  );
+  // Mounted gate: the server renders null, and the client's first render must
+  // be null too. Without this, a fine-pointer device renders the cursor divs
+  // on the first client pass where the server had nothing, shifting every
+  // useId below this component and tripping a hydration mismatch.
+  const mounted = useSyncExternalStore(subscribeMounted, () => true, () => false);
+  const x = useMotionValue(-200);
+  const y = useMotionValue(-200);
+
+  const coreX = useSpring(x, { stiffness: 500, damping: 40, mass: 0.4 });
+  const coreY = useSpring(y, { stiffness: 500, damping: 40, mass: 0.4 });
+  const smokeX = useSpring(x, { stiffness: 90, damping: 18, mass: 0.9 });
+  const smokeY = useSpring(y, { stiffness: 90, damping: 18, mass: 0.9 });
+
+  useEffect(() => {
+    if (isAdmin || !finePointer) return;
+    const move = (event: MouseEvent) => {
+      x.set(event.clientX);
+      y.set(event.clientY);
+    };
+    window.addEventListener("mousemove", move, { passive: true });
+    return () => window.removeEventListener("mousemove", move);
+  }, [isAdmin, finePointer, x, y]);
+
+  if (isAdmin || !mounted || reduce || !finePointer) return null;
+
+  return (
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[80] motion-reduce:hidden overflow-hidden">
+      <motion.div
+        style={{ x: smokeX, y: smokeY }}
+        className="absolute top-0 left-0 will-change-transform transform-gpu"
+      >
+        <div className="h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/15 blur-[48px] pointer-events-none" />
+      </motion.div>
+      <motion.div
+        style={{ x: coreX, y: coreY }}
+        className="absolute top-0 left-0 will-change-transform transform-gpu"
+      >
+        <div className="size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_10px_3px_rgba(var(--color-accent-rgb),0.55)] pointer-events-none" />
+      </motion.div>
+    </div>
+  );
+}

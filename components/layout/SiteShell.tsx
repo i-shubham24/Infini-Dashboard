@@ -1,0 +1,29 @@
+import type { ReactNode } from "react";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { getSettings } from "@/lib/data/settings";
+import { INFINI_CONTACT } from "@/lib/constants/contact";
+
+const FALLBACK_NAV = [{ label: "Home", href: "/" }];
+
+/** Public site chrome: navbar, footer, all on the single brand theme. */
+export async function SiteShell({ children }: { children: ReactNode }) {
+  const settings = await getSettings();
+  const navItems = settings?.nav ?? FALLBACK_NAV;
+
+  return (
+    /* data-site marks the public tree, so the monochrome photography rule in
+       globals.css applies here and never inside the admin panel, where
+       media thumbnails and certificate previews have to show true colour. */
+    <div data-site="public" className="contents">
+      <Navbar navItems={navItems} />
+      {children}
+      <Footer
+        navItems={navItems}
+        legalLinks={settings?.footerLegalLinks ?? []}
+        contact={INFINI_CONTACT}
+        social={settings?.social ?? null}
+      />
+    </div>
+  );
+}
